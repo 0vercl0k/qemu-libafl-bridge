@@ -670,10 +670,10 @@ static void root_restore_check_memory_rb(gpointer rb_idstr_hash,
              i += syx_snapshot_state.page_size) {
             if (memcmp(rb->host + i, rb_snapshot->ram + i,
                        syx_snapshot_state.page_size) != 0) {
-                SYX_ERROR("\nFound incorrect page at offset 0x%lx\n", i);
+                SYX_ERROR("\nFound incorrect page at offset 0x%" PRIx64 "\n", i);
                 for (uint64_t j = 0; j < syx_snapshot_state.page_size; j++) {
                     if (*(rb->host + i + j) != *(rb_snapshot->ram + i + j)) {
-                        SYX_ERROR("\t- byte at address 0x%lx differs\n", i + j);
+                        SYX_ERROR("\t- byte at address 0x%" PRIx64 " differs\n", i + j);
                     }
                 }
                 args->nb_inconsistent_pages++;
@@ -681,7 +681,7 @@ static void root_restore_check_memory_rb(gpointer rb_idstr_hash,
         }
 
         if (args->nb_inconsistent_pages > 0) {
-            SYX_ERROR("[%s] Found %lu page %s.\n", rb->idstr,
+            SYX_ERROR("[%s] Found %" PRIu64 " page %s.\n", rb->idstr,
                       args->nb_inconsistent_pages,
                       args->nb_inconsistent_pages > 1 ? "inconsistencies"
                                                       : "inconsistency");

@@ -171,7 +171,7 @@ static bool write_to_cache_layer(SyxCowCacheLayer* sccl, BlockBackend* blk,
     if (qiov->size % sccl->chunk_size) {
         // todo: determine if it is worth developing an unaligned access
         // version.
-        printf("error: 0x%zx %% 0x%lx == 0x%lx\n", qiov->size, sccl->chunk_size,
+        printf("error: 0x%zx %% 0x%" PRIx64 " == 0x%" PRIx64 "\n", qiov->size, sccl->chunk_size,
                qiov->size % sccl->chunk_size);
         exit(1);
     }
