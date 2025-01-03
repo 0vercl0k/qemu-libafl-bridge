@@ -3,9 +3,9 @@
 import subprocess, json, sys, os, re
 
 FILTER = ['-shared']
-# On Windows this option `-Wl,--out-implib=libqemu-system-x86_64.dll.a` makes
+# On Windows this option `-Wl,--out-implib=libqemu-system-x86_64w.dll.a` makes
 # the compilation fails with "collect2.exe: error: ld returned 5 exit status"
-FILTER += ['-Wl,--out-implib=libqemu-system-x86_64.dll.a']
+FILTER += ['-Wl,--out-implib=libqemu-system-x86_64w.dll.a']
 
 CC = os.getenv('__LIBAFL_QEMU_BUILD_CC') or 'cc'
 CXX = os.getenv('__LIBAFL_QEMU_BUILD_CXX') or 'c++'
@@ -43,8 +43,13 @@ def fix_compile_commands():
     with open("compile_commands.json", 'w') as f:
         f.write(res)
 
+    # XXX: This is racy?
+    #   FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'build/compile_commands.json' -> '../compile_commands.json'
     if not os.path.isfile("../compile_commands.json"):
-        os.symlink("build/compile_commands.json", "../compile_commands.json")
+        try:
+            os.symlink("build/compile_commands.json", "../compile_commands.json")
+        except FileExistsError:
+            pass
 
 def process_args(args):
     global out_args, shareds, search, is_linking_qemu

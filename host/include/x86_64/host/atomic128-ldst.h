@@ -16,6 +16,12 @@
 #include "tcg/debug-assert.h"
 #include <immintrin.h>
 
+#ifdef LIBAFL_QEMU_BINDGEN
+// XXX: Because we turn off a bunch of headers from being parsed by bindgen, we end up
+// with not having the definition of that type, so redefining it here.
+typedef long long __m128i __attribute__ ((__vector_size__ (16), __may_alias__));
+#endif
+
 typedef union {
     __m128i v;
     __int128_t i;
