@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-import subprocess, shutil, json, sys, os, re
+import subprocess, json, sys, os, re
 
 FILTER = ['-shared']
+# On Windows this option `-Wl,--out-implib=libqemu-system-x86_64.dll.a` makes
+# the compilation fails with "collect2.exe: error: ld returned 5 exit status"
+FILTER += ['-Wl,--out-implib=libqemu-system-x86_64.dll.a']
 
 CC = os.getenv('__LIBAFL_QEMU_BUILD_CC') or 'cc'
 CXX = os.getenv('__LIBAFL_QEMU_BUILD_CXX') or 'c++'
@@ -23,8 +26,8 @@ rpath = []
 
 is_linking_qemu = False
 
-shared_library_pattern = r"^[^-].*/lib(.*)\.so(\.[0-9].*)?(?!rsp)$"
-rpath_pattern = r".*,-rpath,(.*)'?.*"
+shared_library_pattern = r"^[^-].*/lib(.*)\.(so|dll)(\.[0-9].*)?(?!rsp)$"
+rpath_pattern = r"^'.*,-rpath,(.*)'$"
 rpath_link_pattern = r"^.*,-rpath-link,(.*)$"
 
 linker_interceptor_pattern = r"(\": \")(.*linker_interceptor.py)( )"
@@ -50,7 +53,7 @@ def process_args(args):
     for i in range(len(args)):
         if prev_o:
             prev_o = False
-            if args[i].endswith('.so') and args[i].startswith('libqemu'):
+            if args[i].endswith(('.dll', '.so')) and args[i].startswith('libqemu'):
                 is_linking_qemu = True
             continue
         elif args[i] in FILTER:
@@ -102,5 +105,7 @@ if is_linking_qemu:
             'sources': sources,
         }, f, indent=2)
 
-r = subprocess.run([cc] + args)
+r = subprocess.run([cc] + args, capture_output=True)
+s = r.stderr if r.returncode != 0 else r.stdout
+print(s.decode('utf-8'), end='')
 sys.exit(r.returncode)
