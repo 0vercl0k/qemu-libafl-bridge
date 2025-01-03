@@ -27,7 +27,7 @@ rpath = []
 is_linking_qemu = False
 
 shared_library_pattern = r"^[^-].*/lib(.*)\.(so|dll)(\.[0-9].*)?(?!rsp)$"
-rpath_pattern = r"^'.*,-rpath,(.*)'$"
+rpath_pattern = r".*,-rpath,(.*)'?.*"
 rpath_link_pattern = r"^.*,-rpath-link,(.*)$"
 
 linker_interceptor_pattern = r"(\": \")(.*linker_interceptor.py)( )"
@@ -105,7 +105,5 @@ if is_linking_qemu:
             'sources': sources,
         }, f, indent=2)
 
-r = subprocess.run([cc] + args, capture_output=True)
-s = r.stderr if r.returncode != 0 else r.stdout
-print(s.decode('utf-8'), end='')
+r = subprocess.run([cc] + args)
 sys.exit(r.returncode)
