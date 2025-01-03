@@ -7,6 +7,7 @@ FILTER = ['-shared']
 # the compilation fails with "collect2.exe: error: ld returned 5 exit status"
 FILTER += ['-Wl,--out-implib=libqemu-system-x86_64w.dll.a']
 FILTER += ['-Wl,--out-implib=libqemu-system-arm.dll.a']
+FILTER += ['-Wl,--out-implib=libqemu-system-armw.dll.a']
 
 CC = os.getenv('__LIBAFL_QEMU_BUILD_CC') or 'cc'
 CXX = os.getenv('__LIBAFL_QEMU_BUILD_CXX') or 'c++'
